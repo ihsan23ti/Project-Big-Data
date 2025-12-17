@@ -3,53 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTC Dashboard Simple</title>
+    <title>Dashboard NTC Realtime</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #333; }
-        .file-upload { border: 2px dashed #ccc; padding: 20px; text-align: center; margin-bottom: 20px; border-radius: 8px; cursor: pointer; }
-        .file-upload:hover { background-color: #f9f9f9; border-color: #666; }
+        
         .control-panel { display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        
         .input-group { margin-bottom: 20px; text-align: center; }
         input[type="number"] { padding: 10px; font-size: 18px; width: 100px; text-align: center; border: 2px solid #007bff; border-radius: 5px; }
+        
         .cards { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
         .card { flex: 1; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
         .card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; }
         .card .value { font-size: 20px; font-weight: bold; color: #333; }
+        
         .status-box { padding: 20px; border-radius: 8px; text-align: center; color: white; font-weight: bold; font-size: 18px; margin-top: 10px; }
-        .status-normal { background-color: #28a745; }
-        .status-warning { background-color: #ffc107; color: black; }
-        .status-danger { background-color: #dc3545; }
-        .hidden { display: none; }
+        .status-normal { background-color: #28a745; } /* Hijau */
+        .status-warning { background-color: #ffc107; color: black; } /* Kuning */
+        .status-danger { background-color: #dc3545; } /* Merah */
+        
+        #loadingMsg { text-align: center; color: blue; font-style: italic; margin-top: 20px;}
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🎛️ Dashboard NTC </h1>
-    <p style="text-align: center; color: #666;"></p>
-
-    <div class="file-upload">
-        <p>📂 <strong>Langkah 1:</strong> Klik tombol di bawah untuk memilih file CSV Anda</p>
-        <input type="file" id="csvFileInput" accept=".csv">
-    </div>
+    <h1>🎛️ Dashboard Monitoring NTC</h1>
+    
+    <p id="loadingMsg">Sedang menghubungkan ke data...</p>
 
     <div id="dashboard" class="control-panel">
         <div class="input-group">
-            <label><strong>Langkah 2: Masukkan Suhu (°C)</strong></label><br><br>
-            <input type="number" id="tempInput" placeholder="30" oninput="updateDashboard()">
-            <p style="font-size: 12px; color: #888; margin-top: 5px;">Ketik angka 0 - 100</p>
+            <label><strong>Masukkan Suhu (°C)</strong></label><br><br>
+            <input type="number" id="tempInput" placeholder="" oninput="updateDashboard()">
+            <p style="font-size: 12px; color: #888; margin-top: 5px;">Data tersedia untuk suhu 0 - 100°C</p>
         </div>
 
         <div class="cards">
             <div class="card">
                 <h3>Hambatan (Ω)</h3>
-                <div class="value" id="valRes">0</div>
+                <div class="value" id="valRes">-</div>
             </div>
             <div class="card">
                 <h3>Tegangan (V)</h3>
-                <div class="value" id="valVolt">0</div>
+                <div class="value" id="valVolt">-</div>
             </div>
             <div class="card">
                 <h3>Risiko</h3>
@@ -58,95 +57,124 @@
         </div>
 
         <div id="statusBox" class="status-box status-normal">
-            STATUS: MENUNGGU INPUT
+            STATUS: MENUNGGU
         </div>
-        <div id="alarmText" style="text-align: center; margin-top: 10px; font-weight: bold; color: red; display: none;">
-            🚨 ALARM BERBUNYI!
+        
+        <div id="alarmText" style="text-align: center; margin-top: 15px; font-weight: bold; color: red; display: none; font-size: 1.2em; animation: blink 1s infinite;">
+            🚨 ALARM BERBUNYI! 🚨
         </div>
     </div>
 </div>
 
+<style>
+    @keyframes blink { 50% { opacity: 0; } }
+</style>
+
 <script>
     let csvData = [];
 
-    // Fungsi membaca CSV
-    document.getElementById('csvFileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    // --- BAGIAN UTAMA: LOAD OTOMATIS ---
+    window.addEventListener('DOMContentLoaded', function() {
+        // Mengambil file spesifik yang kamu upload
+        fetch('Hasil_Prediksi_NTC.csv') 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("File CSV tidak ditemukan! Pastikan nama file 'Hasil_Prediksi_NTC.csv' ada di folder yang sama.");
+                }
+                return response.text();
+            })
+            .then(text => {
+                parseCSV(text);
+                
+                // Jika sukses, sembunyikan loading dan tampilkan dashboard
+                document.getElementById('loadingMsg').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const text = e.target.result;
-            parseCSV(text);
-            document.getElementById('dashboard').style.display = 'block';
-            document.querySelector('.file-upload').style.display = 'none';
-            document.getElementById('tempInput').value = 30; // Default awal
-            updateDashboard(); // Jalankan sekali
-        };
-        reader.readAsText(file);
+                updateDashboard();
+            })
+            .catch(error => {
+                document.getElementById('loadingMsg').innerText = "Gagal Memuat: " + error.message;
+                document.getElementById('loadingMsg').style.color = "red";
+            });
     });
 
-    // Fungsi mengubah teks CSV menjadi Data Array
+    // Fungsi Menerjemahkan CSV ke Array
     function parseCSV(text) {
         const lines = text.split('\n');
-        // Mulai dari i=1 karena baris 0 adalah Header (Judul Kolom)
+        
+        // Loop mulai dari i=1 untuk melewati Header
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (line) {
                 const cols = line.split(',');
-                // Mapping sesuai struktur CSV Anda: 
-                // 0:Suhu, 1:Hambatan, 2:Tegangan, 3:Risiko, 4:Status, 5:Alarm
+                
+                // MAPPING SESUAI FILE KAMU:
+                // 0: suhu_c
+                // 1: hambatan_ntc_ohm
+                // 2: tegangan_v
+                // 3: Risiko
+                // 4: Status
+                // 5: Alarm
+                
                 csvData.push({
-                    suhu: parseFloat(cols[0]),
-                    hambatan: cols[1],
-                    tegangan: cols[2],
-                    risiko: cols[3],
-                    status: cols[4],
-                    alarm: cols[5]
+                    suhu: parseFloat(cols[0]),     // Kolom 0
+                    hambatan: cols[1],             // Kolom 1
+                    tegangan: cols[2],             // Kolom 2
+                    risiko: cols[3],               // Kolom 3
+                    status: cols[4],               // Kolom 4
+                    alarm: cols[5]                 // Kolom 5
                 });
             }
         }
     }
 
-    // Fungsi Update Tampilan saat user mengetik
+    // Fungsi Update Tampilan
     function updateDashboard() {
         const inputVal = parseFloat(document.getElementById('tempInput').value);
         
-        // Cari data yang suhunya sama
+        // Cari data berdasarkan suhu yang diinput
         const data = csvData.find(d => d.suhu === inputVal);
 
         if (data) {
-            // Update Angka
+            // Update Angka di Kartu
             document.getElementById('valRes').innerText = data.hambatan + " Ω";
             document.getElementById('valVolt').innerText = data.tegangan + " V";
             document.getElementById('valRisk').innerText = data.risiko;
 
-            // Update Warna & Status
+            // Update Kotak Status
             const box = document.getElementById('statusBox');
-            const alarmTxt = document.getElementById('alarmText');
-            
             box.innerText = "STATUS: " + data.status.toUpperCase();
             
-            // Logika Warna
-            box.className = 'status-box'; // Reset class
-            if (data.status === 'Normal') {
+            // Reset kelas warna dulu
+            box.className = 'status-box'; 
+            
+            // Logika Warna Status
+            // Cek text lower case agar aman (misal "Normal" atau "normal")
+            const statusText = data.status.toLowerCase();
+            
+            if (statusText.includes('normal')) {
                 box.classList.add('status-normal');
-            } else if (data.status === 'Waspada' || data.status === 'Warning') {
+            } else if (statusText.includes('waspada') || statusText.includes('warning')) {
                 box.classList.add('status-warning');
             } else {
+                // Untuk status Bahaya / Tinggi / Overheating
                 box.classList.add('status-danger');
             }
 
-            // Logika Alarm
+            // Logika Alarm (Cek kolom Alarm: ON / OFF)
+            const alarmTxt = document.getElementById('alarmText');
             if (data.alarm && data.alarm.includes("ON")) {
                 alarmTxt.style.display = 'block';
             } else {
                 alarmTxt.style.display = 'none';
             }
         } else {
-            // Jika suhu tidak ditemukan (misal user input 1000)
-            document.getElementById('statusBox').innerText = "Data tidak ditemukan untuk suhu ini";
+            // Jika data suhu tidak ada di CSV
+            document.getElementById('statusBox').innerText = "Data tidak tersedia";
             document.getElementById('statusBox').className = 'status-box status-warning';
+            document.getElementById('valRes').innerText = "-";
+            document.getElementById('valVolt').innerText = "-";
         }
     }
 </script>
