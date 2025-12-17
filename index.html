@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Big Data Monitoring</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- PREMIUM THEME CONFIGURATION --- */
+        :root {
+            /* Palette: Modern Indigo & Slate */
+            --primary: #4f46e5;       /* Indigo 600 */
+            --primary-glow: #818cf8;  /* Indigo 400 */
+            --dark: #0f172a;          /* Slate 900 */
+            --light: #f1f5f9;         /* Slate 100 */
+            --text-main: #1e293b;     /* Slate 800 */
+            --text-sub: #64748b;      /* Slate 500 */
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --card-radius: 24px;
+        }
+
+        /* --- RESET & BODY --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-font-smoothing: antialiased; }
+        
+        body { 
+            background: #f8fafc;
+            /* Background Mesh Gradient yang halus */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, hsla(253,16%,7%,0) 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, hsla(225,39%,30%,0) 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, hsla(339,49%,30%,0) 50%);
+            background-color: #f1f5f9;
+            background-attachment: fixed;
+            background-size: cover;
+            color: var(--text-main); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            overflow-x: hidden; 
+        }
+
+        /* --- NAVBAR (Floating Glass) --- */
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 1280px;
+            z-index: 1000;
+            border-radius: 100px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+        }
+
+        .navbar .logo {
+            color: var(--dark);
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+        
+        .navbar .logo i { color: var(--primary); font-size: 1.3rem; }
+
+        .nav-links { display: flex; gap: 8px; background: #f1f5f9; padding: 5px; border-radius: 50px; }
+
+        .nav-links button {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .nav-links button:hover { color: var(--dark); }
+        .nav-links button.active { background: #fff; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        /* --- CONTENT LAYOUT --- */
+        .main-content {
+            margin-top: 130px; /* Space for floating nav */
+            padding: 0 20px 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-section {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .page-section.active-section { display: block; }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.98) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- PREMIUM CARD DESIGN --- */
+        .content-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border-radius: var(--card-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Subtle glowing gradient on top border of cards */
+        .content-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), #a5b4fc);
+            opacity: 0.7;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            letter-spacing: -0.5px;
+        }
+        .section-title i { color: var(--primary); background: #e0e7ff; padding: 10px; border-radius: 12px; font-size: 1.2rem; }
+
+        /* --- HOME / HERO SECTION --- */
+        .hero-section { text-align: center; padding: 60px 20px; }
+        
+        .badge-hero {
+            background: #e0e7ff; color: var(--primary); padding: 8px 16px; 
+            border-radius: 50px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px;
+            display: inline-block; margin-bottom: 20px; text-transform: uppercase;
+        }
+
+        .hero-title { 
+            font-size: 3.5rem; 
+            line-height: 1.1;
+            font-weight: 800; 
+            margin-bottom: 20px; 
+            letter-spacing: -1.5px;
+            background: -webkit-linear-gradient(315deg, #1e293b 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc { color: var(--text-sub); max-width: 650px; margin: 0 auto 50px; font-size: 1.2rem; line-height: 1.6; }
+        
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .shortcut-card {
+            background: white; padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            text-align: left; 
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+        
+        .shortcut-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+            border-color: #c7d2fe;
+        }
+        
+        .shortcut-card .icon-box { 
+            width: 55px; height: 55px; background: linear-gradient(135deg, #4f46e5, #818cf8); 
+            border-radius: 16px; display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 1.4rem; margin-bottom: 20px; 
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .shortcut-card h4 { font-size: 1.2rem; margin-bottom: 8px; font-weight: 700; }
+
+        /* --- TEXT & GRID --- */
+        .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media(max-width: 900px) { 
+            .grid-2-col { grid-template-columns: 1fr; } 
+            .navbar { width: 100%; top: 0; border-radius: 0; padding: 0 20px; }
+            .nav-links { display: none; /* Mobile menu logic omitted for simplicity, simplified to scroll for mobile */ }
+            /* Simple mobile handling: show scrollable nav */
+            .nav-links { display: flex; overflow-x: auto; width: 100%; padding-bottom: 10px; margin-top: 10px;}
+            .navbar { flex-direction: column; height: auto; padding: 15px;}
+            .hero-title { font-size: 2.5rem; }
+        }
+
+        .text-content p { color: var(--text-sub); line-height: 1.8; margin-bottom: 15px; font-size: 1.05rem; }
+        .text-content strong { color: var(--dark); font-weight: 700; }
+
+        /* --- PIPELINE --- */
+        .pipeline-box {
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            color: white;
+            border: 1px solid #334155;
+            position: relative;
+        }
+        /* Grid pattern overlay */
+        .pipeline-box::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.3; pointer-events: none;
+        }
+
+        /* --- DATA TABLE --- */
+        .table-container { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .custom-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        
+        .custom-table th { 
+            background: #f8fafc; padding: 18px 25px; text-align: left; 
+            color: var(--text-sub); font-weight: 700; font-size: 0.8rem; 
+            text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .custom-table td { padding: 20px 25px; border-bottom: 1px solid #f1f5f9; color: var(--text-main); font-weight: 500; }
+        .custom-table tr:last-child td { border-bottom: none; }
+        .custom-table tr:hover { background: #f8fafc; }
+
+        .badge { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; }
+        .badge-num { background: #eff6ff; color: #4f46e5; }
+        .badge-cat { background: #fdf2f8; color: #db2777; }
+        .badge-id { background: #f1f5f9; color: #64748b; font-family: monospace; }
+
+        /* --- ABOUT US --- */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
+        
+        .team-card { 
+            text-align: center; padding: 40px 20px; 
+            background: white; border-radius: 24px; 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); 
+            border: 1px solid #f1f5f9; transition: 0.3s;
+        }
+        .team-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.15); border-color: #c7d2fe; }
+        
+        .avatar { 
+            width: 110px; height: 110px; 
+            background: #e2e8f0; border-radius: 50%; 
+            margin: 0 auto 20px; object-fit: cover; 
+            border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .team-name { color: var(--dark); font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
+        .team-role { color: var(--primary); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- UTILS --- */
+        iframe, object { width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-layer-group"></i> 
+            <span>DATA NTC <span style="font-weight:400; color:#64748b;">PROJECT</span></span>
+        </div>
+        <div class="nav-links">
+            <button onclick="showPage('home')" id="btn-home" class="active">Home</button>
+            <button onclick="showPage('info')" id="btn-info">Project</button>
+            <button onclick="showPage('data')" id="btn-data">Database</button>
+            <button onclick="showPage('tableau')" id="btn-tableau">Analytics</button>
+            <button onclick="showPage('ntc')" id="btn-ntc">Live IoT</button>
+            <button onclick="showPage('about')" id="btn-about">Team</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+
+        <div id="home" class="page-section active-section">
+            <div class="hero-section">
+                <span class="badge-hero">Big Data </span>
+                <h1 class="hero-title">Intelligent Monitoring<br> & Prediction System</h1>
+                <p class="hero-desc">Platform analitik terintegrasi untuk pemantauan suhu, tegangan, dan hambatan menggunakan arsitektur Big Data modern.</p>
+                
+                <div class="shortcut-grid">
+                    <div class="shortcut-card" onclick="showPage('info')">
+                        <div class="icon-box"><i class="fa-solid fa-rocket"></i></div>
+                        <h4>Project Overview</h4>
+                        <p style="font-size: 0.95rem; color: #64748b;">Pahami latar belakang, tantangan teknis, dan solusi arsitektur kami.</p>
+                    </div>
+                    <div class="shortcut-card" onclick="showPage('tableau')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.3);"><i class="fa-solid fa-chart-pie"></i></div>
+                        <h4>Data Analytics</h4>
+                        <p style="font-size: 0.95rem; color: #64748b;">Visualisasi mendalam tren data historis melalui Dashboard Tableau.</p>
+                    </div>
+                    <div class="shortcut-card" onclick="showPage('ntc')">
+                        <div class="icon-box" style="background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 10px 15px -3px rgba(185, 28, 28, 0.3);"><i class="fa-solid fa-bolt"></i></div>
+                        <h4>Realtime IoT</h4>
+                        <p style="font-size: 0.95rem; color: #64748b;">Monitoring langsung kondisi sensor NTC & Voltage di lapangan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="info" class="page-section">
+            <div class="grid-2-col">
+                <div class="content-card">
+                    <h3 class="section-title"><i class="fa-solid fa-lightbulb"></i> Executive Summary</h3>
+                    <div class="text-content">
+                        <p>Proyek ini dirancang untuk menciptakan ekosistem <strong>pemantauan cerdas (Intelligent Monitoring)</strong> yang secara proaktif mendeteksi anomali pada infrastruktur perangkat keras kritis.</p>
+                        <p>Mengintegrasikan <strong>IoT Sensors</strong> dengan <strong>Big Data Pipeline</strong>, sistem kami mentransformasi data mentah menjadi wawasan yang dapat ditindaklanjuti (actionable insights) untuk mencegah downtime.</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 class="section-title"><i class="fa-solid fa-circle-exclamation" style="color:#ef4444; background:#fee2e2;"></i> Problem Statement</h3>
+                    <div class="text-content">
+                        <div style="display:flex; gap:15px; margin-bottom:15px; align-items:flex-start;">
+                            <div style="background:#f1f5f9; padding:8px 12px; border-radius:8px; font-weight:800; color:#cbd5e1;">01</div>
+                            <p style="margin:0;"><strong>Unpredicted Overheating:</strong> Lonjakan suhu mikroskopis sering terlewatkan oleh pemantauan manual konvensional.</p>
+                        </div>
+                        <div style="display:flex; gap:15px; margin-bottom:15px; align-items:flex-start;">
+                            <div style="background:#f1f5f9; padding:8px 12px; border-radius:8px; font-weight:800; color:#cbd5e1;">02</div>
+                            <p style="margin:0;"><strong>Voltage Instability:</strong> Fluktuasi tegangan yang tidak stabil memperpendek umur komponen elektronik secara drastis.</p>
+                        </div>
+                        <div style="display:flex; gap:15px; align-items:flex-start;">
+                            <div style="background:#f1f5f9; padding:8px 12px; border-radius:8px; font-weight:800; color:#cbd5e1;">03</div>
+                            <p style="margin:0;"><strong>Latency in Response:</strong> Ketiadaan sistem terpusat menyebabkan jeda waktu yang fatal antara insiden dan perbaikan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3 class="section-title"><i class="fa-solid fa-network-wired"></i> System Architecture</h3>
+                <p style="margin-bottom: 30px; color: var(--text-sub);">Visualisasi alur data End-to-End dari akuisisi sinyal sensor hingga visualisasi dashboard.</p>
+                
+<div class="pipeline-box">
+    <i class="fa-solid fa-diagram-project" style="font-size: 4rem; margin-bottom: 20px; color: #818cf8;"></i>
+    
+    <h4 style="font-size:1.5rem; font-weight:700;">Data Pipeline Diagram</h4>
+
+    <!-- Pipeline Image -->
+    <div style="margin-top:20px; display:flex; justify-content:center;">
+        <img 
+            src="pipeline.png" 
+            alt="Big Data Pipeline Sensor NTC"
+            style="
+                max-width: 100%;
+                width: 700px;
+                border-radius: 16px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+            "
+        />
+    </div>
+
+    <!-- Pipeline Flow Text -->
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap;">
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">Sensor NTC</span>
+        <span style="color:#64748b;">→</span>
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">Data Ingestion</span>
+        <span style="color:#64748b;">→</span>
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">ETL</span>
+        <span style="color:#64748b;">→</span>
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">Big Data Storage</span>
+        <span style="color:#64748b;">→</span>
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">Data Visualization</span>
+        <span style="color:#64748b;">→</span>
+        <span style="background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:20px; font-size:0.8rem;">Web Dashboard</span>
+    </div>
+
+    <p style="margin-top: 15px; font-size: 0.85rem; color: #94a3b8; font-style: italic;">
+        Gambar arsitektur pipeline Big Data pengolahan data sensor IoT
+    </p>
+</div>
+
+            </div>
+        </div>
+
+        <div id="data" class="page-section">
+            <div class="content-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:25px;">
+                    <div>
+                        <h3 class="section-title" style="margin-bottom:10px;"><i class="fa-solid fa-database"></i> Data Dictionary</h3>
+                        <p style="color: var(--text-sub);">Spesifikasi skema dokumen MongoDB (NoSQL) yang digunakan.</p>
+                    </div>
+                    <div style="background:#ecfdf5; color:#059669; padding:8px 15px; border-radius:8px; font-weight:600; font-size:0.85rem;">
+                        <i class="fa-solid fa-check-circle"></i> JSON Format
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Field Name</th>
+                                <th>Data Type</th>
+                                <th>Description & Sample</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>_id</td>
+                                <td><span class="badge badge-id">ObjectId</span></td>
+                                <td>Unique identifier generated by MongoDB.<br><small style="color:#94a3b8;">Ex: 6942dd2488...</small></td>
+                            </tr>
+                            <tr>
+                                <td>suhu_c</td>
+                                <td><span class="badge badge-num">Int32</span></td>
+                                <td>Temperatur lingkungan dalam Celsius.<br><small style="color:#94a3b8;">Range: 0 - 100°C</small></td>
+                            </tr>
+                            <tr>
+                                <td>hambatan_ntc_ohm</td>
+                                <td><span class="badge badge-num">Int32</span></td>
+                                <td>Nilai resistansi mentah dari sensor NTC.<br><small style="color:#94a3b8;">Ex: 27936 Ω</small></td>
+                            </tr>
+                            <tr>
+                                <td>tegangan_v</td>
+                                <td><span class="badge badge-num">Double</span></td>
+                                <td>Tegangan input terukur (presisi tinggi).<br><small style="color:#94a3b8;">Ex: 3.682 V</small></td>
+                            </tr>
+                            <tr>
+                                <td>Risiko</td>
+                                <td><span class="badge badge-cat">String</span></td>
+                                <td>Output Fuzzy Logic untuk tingkat risiko.<br><small style="color:#94a3b8;">Values: "Rendah", "Sedang", "Tinggi"</small></td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td><span class="badge badge-cat">String</span></td>
+                                <td>Kondisi operasional perangkat.<br><small style="color:#94a3b8;">Values: "Normal", "Warning"</small></td>
+                            </tr>
+                            <tr>
+                                <td>Alarm</td>
+                                <td><span class="badge badge-cat">String</span></td>
+                                <td>Status aktuator alarm/buzzer.<br><small style="color:#94a3b8;">Values: "ON", "OFF"</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableau" class="page-section">
+            <div class="content-card">
+                <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> Historical Analysis</h3>
+                <p style="color: var(--text-sub); margin-bottom: 25px;">Dashboard interaktif untuk eksplorasi data historis, tren anomali, dan distribusi risiko.</p>
+                
+                <div class='tableauPlaceholder' id='viz1765996607656' style='position: relative; width: 100%; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0;'>
+                    <noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Da&#47;Dashboard_17659963927710&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript>
+                    <object class='tableauViz' style='display:none;'>
+                        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                        <param name='embed_code_version' value='3' />
+                        <param name='site_root' value='' />
+                        <param name='name' value='Dashboard_17659963927710&#47;Dashboard1' />
+                        <param name='tabs' value='no' />
+                        <param name='toolbar' value='yes' />
+                        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Da&#47;Dashboard_17659963927710&#47;Dashboard1&#47;1.png' />
+                        <param name='animate_transition' value='yes' />
+                        <param name='display_static_image' value='yes' />
+                        <param name='display_spinner' value='yes' />
+                        <param name='display_overlay' value='yes' />
+                        <param name='display_count' value='yes' />
+                        <param name='language' value='en-US' />
+                    </object>
+                </div>
+                <script type='text/javascript'>
+                    var divElement = document.getElementById('viz1765996607656');
+                    var vizElement = divElement.getElementsByTagName('object')[0];
+                    if (divElement.offsetWidth > 800) { vizElement.style.width = '1000px'; vizElement.style.height = '827px'; }
+                    else if (divElement.offsetWidth > 500) { vizElement.style.width = '1000px'; vizElement.style.height = '827px'; }
+                    else { vizElement.style.width = '100%'; vizElement.style.height = '1577px'; }
+                    var scriptElement = document.createElement('script');
+                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                </script>
+            </div>
+        </div>
+
+        <div id="ntc" class="page-section">
+            <div class="content-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #f1f5f9; padding-bottom:20px;">
+                    <h3 style="margin:0; font-size:1.5rem;" class="section-title"><i class="fa-solid fa-tower-broadcast" style="color:#ef4444; background:#fef2f2;"></i> Live Monitoring</h3>
+                    <div style="display:flex; align-items:center; gap:8px; background:#fef2f2; border:1px solid #fee2e2; color:#b91c1c; padding:6px 16px; border-radius:30px; font-weight:700; font-size:0.8rem;">
+                        <span style="display:block; width:8px; height:8px; background:#ef4444; border-radius:50%; animation: pulse 1.5s infinite;"></span>
+                        LIVE STREAM
+                    </div>
+                </div>
+                <div style="height: 800px; width: 100%; border-radius:12px; overflow:hidden;">
+                    <iframe src="ntc_dashboard.html" title="NTC Dashboard" style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" class="page-section">
+            <div class="content-card" style="text-align:center;">
+                <span style="color:var(--primary); font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:0.85rem;">The Minds Behind</span>
+                <h3 style="margin-top:10px; font-size:2rem; color:var(--dark); margin-bottom:40px;">Meet The Engineering Team</h3>
+                <p style="color:#64748b; margin-bottom:50px;">"Siap ga siap, harus Tampil."</p>
+                
+                <div class="team-grid">
+                    <div class="team-card">
+                        <img src="Diaz.jpeg" alt="Diaz" class="avatar">
+                        <h4 class="team-name">Diaz Ardiansyah</h4>
+                    </div>
+
+                    <div class="team-card">
+                        <img src="Daffa.jpeg" alt="Daffa" class="avatar">
+                        <h4 class="team-name">M. Daffa Rizky H.</h4>
+                    </div>
+                    
+                    <div class="team-card">
+                        <img src="Ihsan.jpeg" alt="Ihsan" class="avatar">
+                        <h4 class="team-name">Muhammad Ihsan</h4>
+                    </div>
+                    
+                    <div class="team-card">
+                        <img src="Satrio.jpeg" alt="Rizky" class="avatar">
+                        <h4 class="team-name">Rizky Satrio W.</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            // Animation reset
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => {
+                sec.style.opacity = '0';
+                sec.style.transform = 'translateY(10px)';
+                setTimeout(() => sec.classList.remove('active-section'), 200);
+            });
+
+            const btns = document.querySelectorAll('.nav-links button');
+            btns.forEach(btn => btn.classList.remove('active'));
+
+            setTimeout(() => {
+                const target = document.getElementById(pageId);
+                target.classList.add('active-section');
+                // Trigger animation
+                requestAnimationFrame(() => {
+                    target.style.opacity = '1';
+                    target.style.transform = 'translateY(0)';
+                });
+            }, 200);
+
+            document.getElementById('btn-' + pageId).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+    </script>
+    
+    <style>
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+    </style>
+
+</body>
+</html>

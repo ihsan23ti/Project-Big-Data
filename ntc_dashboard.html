@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTC Dashboard Simple</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        .file-upload { border: 2px dashed #ccc; padding: 20px; text-align: center; margin-bottom: 20px; border-radius: 8px; cursor: pointer; }
+        .file-upload:hover { background-color: #f9f9f9; border-color: #666; }
+        .control-panel { display: none; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+        .input-group { margin-bottom: 20px; text-align: center; }
+        input[type="number"] { padding: 10px; font-size: 18px; width: 100px; text-align: center; border: 2px solid #007bff; border-radius: 5px; }
+        .cards { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; }
+        .card { flex: 1; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center; border: 1px solid #ddd; }
+        .card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; }
+        .card .value { font-size: 20px; font-weight: bold; color: #333; }
+        .status-box { padding: 20px; border-radius: 8px; text-align: center; color: white; font-weight: bold; font-size: 18px; margin-top: 10px; }
+        .status-normal { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; color: black; }
+        .status-danger { background-color: #dc3545; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎛️ Dashboard NTC </h1>
+    <p style="text-align: center; color: #666;"></p>
+
+    <div class="file-upload">
+        <p>📂 <strong>Langkah 1:</strong> Klik tombol di bawah untuk memilih file CSV Anda</p>
+        <input type="file" id="csvFileInput" accept=".csv">
+    </div>
+
+    <div id="dashboard" class="control-panel">
+        <div class="input-group">
+            <label><strong>Langkah 2: Masukkan Suhu (°C)</strong></label><br><br>
+            <input type="number" id="tempInput" placeholder="30" oninput="updateDashboard()">
+            <p style="font-size: 12px; color: #888; margin-top: 5px;">Ketik angka 0 - 100</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Hambatan (Ω)</h3>
+                <div class="value" id="valRes">0</div>
+            </div>
+            <div class="card">
+                <h3>Tegangan (V)</h3>
+                <div class="value" id="valVolt">0</div>
+            </div>
+            <div class="card">
+                <h3>Risiko</h3>
+                <div class="value" id="valRisk">-</div>
+            </div>
+        </div>
+
+        <div id="statusBox" class="status-box status-normal">
+            STATUS: MENUNGGU INPUT
+        </div>
+        <div id="alarmText" style="text-align: center; margin-top: 10px; font-weight: bold; color: red; display: none;">
+            🚨 ALARM BERBUNYI!
+        </div>
+    </div>
+</div>
+
+<script>
+    let csvData = [];
+
+    // Fungsi membaca CSV
+    document.getElementById('csvFileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            parseCSV(text);
+            document.getElementById('dashboard').style.display = 'block';
+            document.querySelector('.file-upload').style.display = 'none';
+            document.getElementById('tempInput').value = 30; // Default awal
+            updateDashboard(); // Jalankan sekali
+        };
+        reader.readAsText(file);
+    });
+
+    // Fungsi mengubah teks CSV menjadi Data Array
+    function parseCSV(text) {
+        const lines = text.split('\n');
+        // Mulai dari i=1 karena baris 0 adalah Header (Judul Kolom)
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line) {
+                const cols = line.split(',');
+                // Mapping sesuai struktur CSV Anda: 
+                // 0:Suhu, 1:Hambatan, 2:Tegangan, 3:Risiko, 4:Status, 5:Alarm
+                csvData.push({
+                    suhu: parseFloat(cols[0]),
+                    hambatan: cols[1],
+                    tegangan: cols[2],
+                    risiko: cols[3],
+                    status: cols[4],
+                    alarm: cols[5]
+                });
+            }
+        }
+    }
+
+    // Fungsi Update Tampilan saat user mengetik
+    function updateDashboard() {
+        const inputVal = parseFloat(document.getElementById('tempInput').value);
+        
+        // Cari data yang suhunya sama
+        const data = csvData.find(d => d.suhu === inputVal);
+
+        if (data) {
+            // Update Angka
+            document.getElementById('valRes').innerText = data.hambatan + " Ω";
+            document.getElementById('valVolt').innerText = data.tegangan + " V";
+            document.getElementById('valRisk').innerText = data.risiko;
+
+            // Update Warna & Status
+            const box = document.getElementById('statusBox');
+            const alarmTxt = document.getElementById('alarmText');
+            
+            box.innerText = "STATUS: " + data.status.toUpperCase();
+            
+            // Logika Warna
+            box.className = 'status-box'; // Reset class
+            if (data.status === 'Normal') {
+                box.classList.add('status-normal');
+            } else if (data.status === 'Waspada' || data.status === 'Warning') {
+                box.classList.add('status-warning');
+            } else {
+                box.classList.add('status-danger');
+            }
+
+            // Logika Alarm
+            if (data.alarm && data.alarm.includes("ON")) {
+                alarmTxt.style.display = 'block';
+            } else {
+                alarmTxt.style.display = 'none';
+            }
+        } else {
+            // Jika suhu tidak ditemukan (misal user input 1000)
+            document.getElementById('statusBox').innerText = "Data tidak ditemukan untuk suhu ini";
+            document.getElementById('statusBox').className = 'status-box status-warning';
+        }
+    }
+</script>
+
+</body>
+</html>
