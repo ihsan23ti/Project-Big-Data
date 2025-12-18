@@ -471,12 +471,12 @@
             </div>
         </div>
 
-        <div id="tableau" class="page-section">
+<div id="tableau" class="page-section">
             <div class="content-card">
                 <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> Historical Analysis</h3>
                 <p style="color: var(--text-sub); margin-bottom: 25px;">Dashboard interaktif untuk eksplorasi data historis, tren anomali, dan distribusi risiko.</p>
                 
-                <div class='tableauPlaceholder' id='viz1765996607656' style='position: relative; width: 100%; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0;'>
+                <div class='tableauPlaceholder' id='viz1765996607656' style='position: relative; width: 100%; border-radius:12px; overflow:hidden; border:1px solid #e2e8f0; margin-bottom: 40px;'>
                     <noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Da&#47;Dashboard_17659963927710&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript>
                     <object class='tableauViz' style='display:none;'>
                         <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
@@ -504,7 +504,79 @@
                     scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
                     vizElement.parentNode.insertBefore(scriptElement, vizElement);
                 </script>
-            </div>
+
+                <div style="background: #f8fafc; border-radius: 20px; padding: 30px; border: 1px solid #e2e8f0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; flex-wrap:wrap; gap:10px;">
+                        <h4 style="color: var(--dark); font-size: 1.3rem; margin:0; display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-magnifying-glass-chart" style="color: var(--primary);"></i> Key Insights
+                        </h4>
+                        <span style="font-size:0.8rem; background:#e0e7ff; color:var(--primary); padding:6px 15px; border-radius:50px; font-weight:600;">
+                            Based on 100 Data Points
+                        </span>
+                    </div>
+                    
+                    <div class="grid-2-col">
+                        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.02);">
+                            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                                <div style="min-width: 50px; height: 50px; background: #fee2e2; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #dc2626; font-size: 1.5rem;">
+                                    <i class="fa-solid fa-temperature-arrow-up"></i>
+                                </div>
+                                <div>
+                                    <h5 style="margin-bottom: 8px; color: var(--dark); font-weight:700; font-size:1.1rem;">Titik Kritis: 45°C</h5>
+                                    <p style="font-size: 0.95rem; color: var(--text-sub); line-height:1.6;">
+                                        Analisis menunjukkan bahwa sistem memasuki status <strong>Overheating</strong> tepat saat suhu menyentuh angka 45°C. Pada titik ini, <strong>Alarm</strong> otomatis aktif (ON) untuk mencegah kerusakan hardware.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.02);">
+                            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                                <div style="min-width: 50px; height: 50px; background: #fff7ed; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #ea580c; font-size: 1.5rem;">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                </div>
+                                <div>
+                                    <h5 style="margin-bottom: 8px; color: var(--dark); font-weight:700; font-size:1.1rem;">Fase Waspada Singkat</h5>
+                                    <p style="font-size: 0.95rem; color: var(--text-sub); line-height:1.6;">
+                                        Zona 'Warning' hanya terdeteksi pada rentang suhu <strong>40°C - 44°C</strong> (hanya 5 data sampel). Ini mengindikasikan bahwa transisi dari kondisi Normal ke Bahaya terjadi sangat cepat, sehingga respon otomatis mutlak diperlukan.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.02);">
+                            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                                <div style="min-width: 50px; height: 50px; background: #ecfdf5; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #059669; font-size: 1.5rem;">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <div>
+                                    <h5 style="margin-bottom: 8px; color: var(--dark); font-weight:700; font-size:1.1rem;">Validasi Sensor (-96%)</h5>
+                                    <p style="font-size: 0.95rem; color: var(--text-sub); line-height:1.6;">
+                                        Terdapat korelasi negatif yang sangat kuat <strong>(-0.96)</strong> antara Suhu dan Hambatan. Hal ini memvalidasi bahwa sensor NTC bekerja normal: <em>Semakin panas suhu, semakin kecil nilai hambatan (Ohm).</em>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.02);">
+                            <div style="display: flex; gap: 20px; align-items: flex-start;">
+                                <div style="min-width: 50px; height: 50px; background: #f0f9ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.5rem;">
+                                    <i class="fa-solid fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <h5 style="margin-bottom: 8px; color: var(--dark); font-weight:700; font-size:1.1rem;">Distribusi Status</h5>
+                                    <p style="font-size: 0.95rem; color: var(--text-sub); margin-bottom:10px;">Mayoritas data simulasi berada pada kondisi ekstrim.</p>
+                                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                        <span style="font-size:0.75rem; background:#dcfce7; color:#166534; padding:4px 10px; border-radius:20px; font-weight:600;">40% Normal</span>
+                                        <span style="font-size:0.75rem; background:#ffedd5; color:#9a3412; padding:4px 10px; border-radius:20px; font-weight:600;">5% Warning</span>
+                                        <span style="font-size:0.75rem; background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:20px; font-weight:600;">55% Overheat</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
         </div>
 
         <div id="ntc" class="page-section">
@@ -589,6 +661,5 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
     </style>
-
 </body>
 </html>
